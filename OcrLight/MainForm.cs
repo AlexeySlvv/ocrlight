@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Tesseract;
@@ -25,12 +27,26 @@ namespace OcrLight
 
         private void MainFormLoad(object sender, EventArgs e)
         {
-            Text = Program.Name;            
+            Text = Program.Name;
+
+            var di = new DirectoryInfo("./tessdata");
+            var files = di.GetFiles("*.traineddata", SearchOption.TopDirectoryOnly)
+                .ToList()
+                .ConvertAll(fi => Path.GetFileNameWithoutExtension(fi.Name))
+                .ToArray<object>();
+            comboBox.Items.AddRange(files);
+            comboBox.Text = Settings.Language;
         }
 
         private void MainFormSizeChanged(object sender, EventArgs e)
         {
             Settings.MainWindowSize = Size;
+            Settings.Save();
+        }
+
+        private void comboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Settings.Language = comboBox.Text;
             Settings.Save();
         }
 
@@ -88,6 +104,11 @@ namespace OcrLight
             Close();
         }
 
+        private void menuHelpMore(object sender, EventArgs e)
+        {
+            Process.Start("https://github.com/tesseract-ocr/tessdata/tree/3.04.00");
+        }
+
         #endregion Main menu
 
         #region Recognize
@@ -116,9 +137,10 @@ namespace OcrLight
         /// <summary>
         /// Text recognizing
         /// </summary>
-        /// <param name="image"></param>
+        /// <param name="bitmap"></param>
+        /// <param name="lang"></param>
         /// <returns></returns>
-        private Task<string> GetOcrTextTaskAsync(Bitmap bitmap)
+        private Task<string> GetOcrTextTaskAsync(Bitmap bitmap, string lang)
         {
             if (bitmap == null)
             {
@@ -127,8 +149,8 @@ namespace OcrLight
 
             return Task.Factory.StartNew(delegate
             {
-                // https://github.com/tesseract-ocr/tessdata
-                using (var engine = new TesseractEngine(@"./tessdata", "jpn"))
+                // https://github.com/tesseract-ocr/tessdata/tree/3.04.00
+                using (var engine = new TesseractEngine(@"./tessdata", lang))
                 {
                     var pix = PixConverter.ToPix(bitmap);
                     using (var page = engine.Process(pix))
@@ -154,7 +176,7 @@ namespace OcrLight
                 richTextBox.ReadOnly = true;
 
                 var bitmap = ImageToBitmap(pictureBox.Image);
-                richTextBox.Text = await GetOcrTextTaskAsync(bitmap);
+                richTextBox.Text = await GetOcrTextTaskAsync(bitmap, comboBox.Text);
             }
             finally
             {

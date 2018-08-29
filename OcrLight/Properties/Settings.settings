@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TesseractDemo.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="OcrLight.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="RichTextBoxFont" Type="System.Drawing.Font" Scope="User">
@@ -7,6 +7,9 @@
     </Setting>
     <Setting Name="MainWindowSize" Type="System.Drawing.Size" Scope="User">
       <Value Profile="(Default)">640, 480</Value>
+    </Setting>
+    <Setting Name="Language" Type="System.String" Scope="User">
+      <Value Profile="(Default)">jpn</Value>
     </Setting>
   </Settings>
 </SettingsFile>
